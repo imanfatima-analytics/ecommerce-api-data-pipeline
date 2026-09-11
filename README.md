@@ -1,30 +1,14 @@
-# Git Day 1
+## What I Learned
 
-## Description
+Today I learned how to:
 
-A beginner Git and GitHub practice project created during Week 3
-of my AI Automation & Backend Engineering roadmap.
-
-## Technologies
-
-- Git
-- GitHub
-- Python
-
-## Files
-
-- `hello.py` — Basic Python practice
-- `.gitignore` — Files ignored by Git
-
-## Git Concepts Practiced
-
-- git init
-- git status
-- git add
-- git commit
-- git log
-- git diff
-- git remote
-- git push
-- git clone
-- git pull
+- Create a Git repository
+- Track files with Git
+- Stage changes
+- Create commits
+- View Git history
+- Use .gitignore
+- Connect Git to GitHub
+- Clone a GitHub repository
+- Pull changes from GitHub
+- Push changes to GitHub
