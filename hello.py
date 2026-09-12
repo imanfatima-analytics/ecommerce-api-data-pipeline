@@ -1,1 +1,1 @@
-print("Hello Git and GitHub - Feature Branch")
+print("Hello from Master Branch")
