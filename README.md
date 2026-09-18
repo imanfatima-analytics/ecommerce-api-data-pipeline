@@ -10,7 +10,6 @@ This project demonstrates practical API integration, data transformation, databa
 
 ## Project Architecture
 
-```text
 External REST API
         ↓
       Python
