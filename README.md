@@ -1,52 +1,87 @@
 # E-Commerce API Data Pipeline
 
-An end-to-end data pipeline that retrieves product data from a REST API, processes the JSON response using Python, and stores the transformed data in PostgreSQL.
+An end-to-end Python data pipeline that retrieves product data from the Fake Store REST API, processes and cleans the JSON response, and stores the transformed data in PostgreSQL.
 
-The project demonstrates API integration, data transformation, database operations, duplicate handling, transaction management, error handling, environment variables, and SQL validation.
+This project demonstrates practical experience with REST API integration, JSON processing, Python data transformation, PostgreSQL database operations, SQL validation, duplicate handling, transaction management, error handling, and environment-variable configuration.
 
-## Project Workflow
+## Project Overview
 
-```text
-REST API → Python → JSON → Data Cleaning → PostgreSQL → SQL Validation
-Project Overview
+The purpose of this project is to build a complete API-to-database workflow using a real HTTP request and a relational database.
 
-The pipeline collects e-commerce product data from the Fake Store API and transforms it into a structured PostgreSQL table.
+The pipeline takes product data from an external REST API and moves it through the following process:
 
-The following fields are processed:
+REST API
+↓
+HTTP GET Request
+↓
+JSON Response
+↓
+Python Processing
+↓
+Data Cleaning & Transformation
+↓
+PostgreSQL
+↓
+SQL Validation & Analysis
 
-Product ID
-Product title
-Price
-Category
-Rating
-Rating count
-API Source
+The project processes the following product information:
 
-Fake Store API:
+* Product ID
+* Product title
+* Price
+* Category
+* Rating
+* Rating count
+
+## API Source
+
+The project uses the Fake Store API as the external data source.
+
+API endpoint:
 
 https://fakestoreapi.com/products
 
-The API provides sample e-commerce product data in JSON format.
+The endpoint returns sample e-commerce product information in JSON format.
 
-Technologies Used
-Python
-REST API
-JSON
-Requests
-PostgreSQL
-psycopg2
-python-dotenv
-SQL
-Git & GitHub
-Data Pipeline
-1. Extract
+## Technologies Used
 
-Python sends a GET request to the REST API and receives product data in JSON format.
+* Python
+* REST API
+* HTTP
+* JSON
+* Requests
+* PostgreSQL
+* psycopg2
+* python-dotenv
+* SQL
+* Git
+* GitHub
 
-2. Transform
+## How the Pipeline Works
 
-The JSON response is processed and the required fields are extracted, including nested rating information.
+### 1. Extract
 
+Python sends an HTTP GET request to the API endpoint.
+
+The response status is checked before processing the returned data.
+
+```python
+response = requests.get(url)
+
+print("API Status:", response.status_code)
+
+products = response.json()
+```
+
+The JSON response is then converted into Python data that can be processed by the application.
+
+### 2. Transform
+
+The API response contains the product information along with nested rating data.
+
+The required fields are extracted and converted into a simpler structure before being stored in the database.
+
+```python
 clean_product = {
     "product_id": product["id"],
     "title": product["title"],
@@ -55,41 +90,62 @@ clean_product = {
     "rating": product["rating"]["rate"],
     "rating_count": product["rating"]["count"]
 }
-3. Load
+```
 
-The cleaned data is inserted into PostgreSQL using psycopg2.
+This transformation separates the required database fields from the original API response structure.
 
-Duplicate product IDs are handled using:
+### 3. Load
 
+The transformed product records are inserted into PostgreSQL using `psycopg2`.
+
+The database table uses `product_id` as the primary key.
+
+Duplicate records are handled using:
+
+```sql
 ON CONFLICT (product_id) DO NOTHING
-4. Validate
+```
 
-SQL queries are used to verify the stored data and perform basic analysis.
+This allows the pipeline to skip an existing product instead of failing because of a duplicate primary key.
 
-Validation includes:
+### 4. Validate
 
-Total product records
-Duplicate product IDs
-Missing values
-Invalid prices
-Product categories
-Product ratings
-Highest-rated products
-Most expensive products
-Database
+After loading the data, SQL queries are used to verify the database contents.
 
-Database: API_Project
+The validation process checks:
 
-Table: products
+* Total number of products
+* Duplicate product IDs
+* Missing product titles
+* Invalid prices
+* Product categories
+* Product ratings
+* Highest-rated products
+* Most expensive products
+* Average prices by category
 
-Column	Data Type	Description
-product_id	INTEGER	Primary key
-title	TEXT	Product name
-price	NUMERIC(10,2)	Product price
-category	TEXT	Product category
-rating	NUMERIC(3,1)	Product rating
-rating_count	INTEGER	Number of ratings
-Table Schema
+## Database Design
+
+Database name:
+
+`API_Project`
+
+Table name:
+
+`products`
+
+| Column       | Data Type     | Description                  |
+| ------------ | ------------- | ---------------------------- |
+| product_id   | INTEGER       | Primary key for each product |
+| title        | TEXT          | Product name                 |
+| price        | NUMERIC(10,2) | Product price                |
+| category     | TEXT          | Product category             |
+| rating       | NUMERIC(3,1)  | Product rating               |
+| rating_count | INTEGER       | Number of ratings            |
+
+### Products Table
+
+```sql
 CREATE TABLE products (
     product_id INTEGER PRIMARY KEY,
     title TEXT NOT NULL,
@@ -98,82 +154,287 @@ CREATE TABLE products (
     rating NUMERIC(3,1),
     rating_count INTEGER
 );
-Project Structure
+```
+
+## Project Structure
+
+```text
 ecommerce-api-data-pipeline/
+│
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
+│
 ├── src/
 │   ├── main.py
 │   └── database.py
+│
 └── sql/
     └── queries.sql
-File Description
-File	Purpose
-README.md	Project documentation
-requirements.txt	Python dependencies
-.gitignore	Excludes sensitive/unnecessary files
-src/main.py	Main API-to-database pipeline
-src/database.py	Database-related operations
-sql/queries.sql	Validation and analysis queries
-.env	Local database configuration
-Installation
+```
+
+## File Responsibilities
+
+### `src/main.py`
+
+Contains the main pipeline workflow.
+
+It handles:
+
+* API request
+* JSON response processing
+* Product extraction
+* Data transformation
+* PostgreSQL connection
+* Product insertion
+* Duplicate handling
+* Transaction handling
+* Error handling
+* Database connection cleanup
+
+### `src/database.py`
+
+Contains database-related functionality used by the project.
+
+### `sql/queries.sql`
+
+Contains SQL queries used to validate and analyze the product data stored in PostgreSQL.
+
+### `requirements.txt`
+
+Contains the Python packages required to run the project.
+
+### `.gitignore`
+
+Prevents sensitive and unnecessary files from being tracked by Git.
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/imanfatima-analytics/ecommerce-api-data-pipeline.git
+```
+
+Move into the project directory:
+
+```bash
+cd ecommerce-api-data-pipeline
+```
 
 Install the required dependencies:
 
+```bash
 py -m pip install -r requirements.txt
+```
 
-Required packages:
+## Python Dependencies
 
+The project uses the following packages:
+
+```text
 requests
 psycopg2-binary
 python-dotenv
-Configuration
+```
 
-Create a .env file in the project root:
+### Requests
 
+Used to send the HTTP request to the external REST API.
+
+### psycopg2-binary
+
+Used to connect Python with PostgreSQL and execute database operations.
+
+### python-dotenv
+
+Used to load database configuration from environment variables stored in the `.env` file.
+
+## PostgreSQL Setup
+
+Create the database:
+
+```sql
+CREATE DATABASE API_Project;
+```
+
+Connect to the database and create the products table:
+
+```sql
+CREATE TABLE products (
+    product_id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL,
+    price NUMERIC(10,2),
+    category TEXT,
+    rating NUMERIC(3,1),
+    rating_count INTEGER
+);
+```
+
+## Environment Configuration
+
+Database credentials are stored locally in a `.env` file instead of being written directly into the Python source code.
+
+Example:
+
+```text
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=API_Project
 DB_USER=postgres
 DB_PASSWORD=YOUR_PASSWORD
+```
 
-Keep .env out of GitHub. Database credentials should never be committed to a public repository.
+The application loads these values using `python-dotenv`.
 
-Run the Project
+```python
+load_dotenv()
+```
 
-Navigate to the project directory:
+The database connection then reads the values through environment variables.
 
-cd Downloads\ecommerce-api-data-pipeline
+```python
+os.getenv("DB_HOST")
+os.getenv("DB_PORT")
+os.getenv("DB_NAME")
+os.getenv("DB_USER")
+os.getenv("DB_PASSWORD")
+```
 
-Run the pipeline:
+The `.env` file is excluded from Git using `.gitignore`.
 
+## Running the Pipeline
+
+After PostgreSQL is configured and the environment variables are set, run:
+
+```bash
 py src\main.py
+```
 
-The pipeline will:
+The application then:
 
-Request data from the REST API
-Receive the JSON response
-Extract and transform product data
-Connect to PostgreSQL
-Insert the products
-Handle duplicate records
-Commit the transaction
-Close the database connection
-SQL Validation
-Total Products
+1. Sends a request to the REST API
+2. Receives the JSON response
+3. Processes the product data
+4. Extracts the required fields
+5. Connects to PostgreSQL
+6. Inserts the transformed records
+7. Handles duplicate product IDs
+8. Commits the transaction
+9. Closes the database connection
+
+A successful execution produces output similar to:
+
+```text
+API Status: 200
+All products inserted successfully!
+Database connection closed.
+```
+
+## Duplicate Handling
+
+The `product_id` column is the primary key of the `products` table.
+
+To prevent duplicate records from stopping the pipeline, the project uses:
+
+```sql
+ON CONFLICT (product_id) DO NOTHING
+```
+
+The behavior is:
+
+Existing product ID
+↓
+Conflict detected
+↓
+Duplicate skipped
+↓
+Pipeline continues
+
+This makes repeated pipeline execution safer because existing product records are not inserted again.
+
+## Transaction Management
+
+Database changes are committed after successful insertion:
+
+```python
+connection.commit()
+```
+
+If an error occurs during the database operation, the transaction can be rolled back:
+
+```python
+connection.rollback()
+```
+
+This prevents unsuccessful database operations from being treated as completed transactions.
+
+## Error Handling
+
+The pipeline uses Python exception handling:
+
+```python
+try:
+    ...
+except Exception as e:
+    ...
+finally:
+    ...
+```
+
+This provides controlled handling of errors and ensures that database resources are closed after execution.
+
+The `finally` block is used to close the cursor and database connection.
+
+## SQL Validation
+
+The project includes SQL queries for checking the quality and contents of the stored data.
+
+### Total Products
+
+```sql
 SELECT COUNT(*) AS total_products
 FROM products;
-Check Duplicate IDs
+```
+
+### View Products
+
+```sql
+SELECT *
+FROM products
+ORDER BY product_id;
+```
+
+### Check Duplicate IDs
+
+```sql
 SELECT product_id, COUNT(*)
 FROM products
 GROUP BY product_id
 HAVING COUNT(*) > 1;
-Check Missing Titles
+```
+
+A correctly loaded dataset should return no duplicate product IDs.
+
+### Check Missing Titles
+
+```sql
 SELECT *
 FROM products
 WHERE title IS NULL;
-Category Analysis
+```
+
+### Check Invalid Prices
+
+```sql
+SELECT *
+FROM products
+WHERE price < 0;
+```
+
+### Category Analysis
+
+```sql
 SELECT
     category,
     COUNT(*) AS total_products,
@@ -181,7 +442,11 @@ SELECT
 FROM products
 GROUP BY category
 ORDER BY total_products DESC;
-Highest-Rated Products
+```
+
+### Highest-Rated Products
+
+```sql
 SELECT
     product_id,
     title,
@@ -190,7 +455,11 @@ SELECT
 FROM products
 ORDER BY rating DESC
 LIMIT 5;
-Most Expensive Products
+```
+
+### Most Expensive Products
+
+```sql
 SELECT
     product_id,
     title,
@@ -199,55 +468,117 @@ SELECT
 FROM products
 ORDER BY price DESC
 LIMIT 5;
-Error Handling
+```
 
-The pipeline uses try, except, and finally to handle errors and safely close database resources.
+## Data Validation
 
-Database transactions are managed using:
+The project performs basic validation after loading the data.
 
-connection.commit()
+The validation process checks:
 
-and:
+* Whether products were inserted
+* Whether duplicate IDs exist
+* Whether product titles are missing
+* Whether prices contain invalid negative values
+* Whether ratings are within the expected range
+* Whether rating counts contain invalid values
+* Product distribution by category
 
-connection.rollback()
-Security
+## Security
 
-Environment variables are used to keep database credentials outside the Python source code.
+Database credentials are not hard-coded into the application.
 
-The .gitignore file excludes:
+The `.env` file is used for local configuration and is excluded from version control.
 
+The `.gitignore` file contains entries such as:
+
+```text
 .env
 venv/
 __pycache__/
+```
 
-No real credentials should be uploaded to GitHub.
+Sensitive database credentials should never be committed to a public GitHub repository.
 
-Skills Demonstrated
-REST API integration
-HTTP requests
-JSON processing
-Python data transformation
+## Git & GitHub
+
+The project is maintained using Git and GitHub.
+
+The repository demonstrates:
+
+* Git repository management
+* Meaningful commits
+* Remote repository management
+* Project structure
+* `.gitignore`
+* GitHub-based project documentation
+
+Repository:
+
+https://github.com/imanfatima-analytics/ecommerce-api-data-pipeline
+
+## Key Learning Outcomes
+
+This project provided practical experience with an end-to-end API-to-database workflow.
+
+Key areas practiced include:
+
+* REST API integration
+* HTTP GET requests
+* JSON processing
+* Nested JSON extraction
+* Python dictionaries and lists
+* Data transformation
+* PostgreSQL database design
+* SQL table creation
+* Primary keys
+* Python-to-PostgreSQL connectivity
+* Data insertion
+* Duplicate handling
+* Transactions
+* Commit and rollback
+* Exception handling
+* Environment variables
+* Credential protection
+* SQL validation
+* Git and GitHub
+
+## Project Workflow Summary
+
+```text
+Fake Store REST API
+        ↓
+HTTP GET Request
+        ↓
+JSON Response
+        ↓
+Python
+        ↓
+Extract Required Fields
+        ↓
+Clean & Transform Data
+        ↓
 PostgreSQL
-SQL
-Database transactions
-Duplicate handling
-Exception handling
-Environment variables
-Git & GitHub
-Basic ETL pipeline development
-Future Improvements
-API timeout and retry handling
-Logging
-Automated tests
-Data validation improvements
-Database indexes
-Docker
-FastAPI CRUD endpoints
-Authentication
-API documentation
-Cloud deployment
-Author
+        ↓
+Insert Products
+        ↓
+Handle Duplicates
+        ↓
+Commit Transaction
+        ↓
+SQL Validation
+```
+
+## Project Outcome
+
+The completed pipeline successfully demonstrates how data can be collected from an external REST API, transformed with Python, stored in PostgreSQL, and validated using SQL.
+
+It combines API integration, Python programming, relational database operations, and SQL into one practical project.
+
+## Author
 
 Iman Fatima
 
 Software Engineering | AI Automation | Data Analytics | Backend Development
+
+GitHub: https://github.com/imanfatima-analytics
