@@ -1,3 +1,5 @@
+# E-Commerce API Data Pipeline
+
 An end-to-end data pipeline that retrieves product data from a REST API, processes the JSON response using Python, and stores the transformed data in PostgreSQL.
 
 The project demonstrates API integration, data transformation, database operations, duplicate handling, transaction management, error handling, environment variables, and SQL validation.
@@ -6,7 +8,6 @@ The project demonstrates API integration, data transformation, database operatio
 
 ```text
 REST API → Python → JSON → Data Cleaning → PostgreSQL → SQL Validation
-
 Project Overview
 
 The pipeline collects e-commerce product data from the Fake Store API and transforms it into a structured PostgreSQL table.
@@ -250,8 +251,3 @@ Author
 Iman Fatima
 
 Software Engineering | AI Automation | Data Analytics | Backend Development
-
-GitHub: https://github.com/imanfatima-analytics
-
-
-This version is **cleaner, shorter, and more portfolio-oriented**. It gives a recruiter the workflow, tech
